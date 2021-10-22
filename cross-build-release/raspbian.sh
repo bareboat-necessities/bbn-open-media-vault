@@ -40,7 +40,7 @@
   # Mount the image and make the binds required to chroot.
   mountImageFile $thisArch ./work/$thisArch/$imageName
 
-  # Copy the lysmarine and origine OS config files in the mounted rootfs
+  # Copy the OMV and original OS config files in the mounted rootfs
   addLysmarineScripts $thisArch
 
   mkRoot=work/${thisArch}/rootfs
@@ -73,7 +73,7 @@ EOF
   ls -l ./work/$thisArch/$imageName
 
   # Renaming the OS and moving it to the release folder.
-  cp -v ./work/$thisArch/$imageName ./release/$thisArch/lysmarine-bbn-omv-iot_${LYSMARINE_VER}-${thisArch}-${cpuArch}.img
+  cp -v ./work/$thisArch/$imageName ./release/$thisArch/bbn-omv_${LYSMARINE_VER}-${thisArch}-${cpuArch}.img
 
   exit 0
 }

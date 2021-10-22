@@ -89,7 +89,7 @@ inflateImage() {
   imageLocationInflated=${imageLocation}-inflated
 
   if [ ! -f $imageLocationInflated ]; then
-    log "Inflating OS image to have enough space to build lysmarine."
+    log "Inflating OS image to have enough space to build OMV."
     cp -fv ${imageLocation} $imageLocationInflated
 
     log "truncate image to 10000M"
@@ -116,7 +116,7 @@ inflateImage() {
 function addLysmarineScripts() {
   thisArch=$1
   rootfs=./work/${thisArch}/rootfs
-  log "copying lysmarine on the image"
+  log "copying OMV on the image"
   ls $rootfs
   rm -rf ${rootfs}/install-scripts-omv/
   cp -r ./install-scripts-omv ${rootfs}/

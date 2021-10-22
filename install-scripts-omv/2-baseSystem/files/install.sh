@@ -155,8 +155,10 @@ case ${codename} in
 esac
 echo "${omvCodename} :: ${version}"
 
-hostname="$(hostname --short)"
-domainname="$(hostname --domain)"
+#hostname="$(hostname --short)"
+#domainname="$(hostname --domain)"
+hostname="raspberrypi"
+domainname="local"
 tz="$(timedatectl show --property=Timezone --value)"
 
 regex='[a-zA-Z]([-a-zA-Z0-9]{0,61}[a-zA-Z0-9])'

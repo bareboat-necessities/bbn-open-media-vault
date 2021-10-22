@@ -1,3 +1,6 @@
 #!/bin/bash -e
 
-cat $FILE_FOLDER/install | bash
+chmod +x $FILE_FOLDER/install.sh
+
+$FILE_FOLDER/install.sh -r
+

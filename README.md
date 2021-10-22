@@ -1,5 +1,5 @@
 # bbn-open-media-vault
-OpenMediaVault by BBN
+OpenMediaVault https://www.openmediavault.org/ build for raspberry pi by BBN
 
 # License
 

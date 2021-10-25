@@ -1,5 +1,5 @@
 # bbn-open-media-vault
-OpenMediaVault https://www.openmediavault.org/ build on https://circleci.com for raspberry pi by BBN
+OpenMediaVault https://www.openmediavault.org/ build on https://circleci.com for Raspberry Pi by BBN
 
 # License
 

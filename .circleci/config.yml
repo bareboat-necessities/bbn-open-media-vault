@@ -19,13 +19,13 @@ commands:
       - run:
           command: |
             .circleci/build-ci.sh
-          no_output_timeout: 40m
+          no_output_timeout: 60m
       - cloudsmith/ensure-api-key
       - cloudsmith/install-cli
       - run:
           command: |
             .circleci/publish-cloudsmith.sh img bbn-cica/bbn ${PKG_DISTRO}/${PKG_RELEASE}
-          no_output_timeout: 40m
+          no_output_timeout: 60m
   do-all:
     steps:
       - git-checkout

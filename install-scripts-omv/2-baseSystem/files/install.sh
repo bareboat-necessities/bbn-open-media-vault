@@ -61,7 +61,12 @@ wpaConf="/etc/wpa_supplicant/wpa_supplicant.conf"
 
 export DEBIAN_FRONTEND=noninteractive
 export APT_LISTCHANGES_FRONTEND=none
-export LANG=C.UTF-8
+export LANG="en_US.UTF-8"
+export LANGUAGE=en_US:en
+export LC_NUMERIC="C"
+export LC_CTYPE="C"
+export LC_MESSAGES="C"
+export LC_ALL="C"
 
 if [ -f /etc/armbian-release ]; then
   . /etc/armbian-release

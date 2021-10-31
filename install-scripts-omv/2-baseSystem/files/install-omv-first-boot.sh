@@ -1,37 +1,12 @@
 #!/bin/bash
-#
-# See original at: https://raw.githubusercontent.com/OpenMediaVault-Plugin-Developers/installScript/master/install
-#
-# shellcheck disable=SC1090,SC1091,SC1117,SC2010,SC2016,SC2046,SC2086,SC2174
-#
-# Copyright (c) 2015-2021 OpenMediaVault Plugin Developers
-# Copyright (c) 2017-2020 Armbian Developers
-#
-# This file is licensed under the terms of the GNU General Public
-# License version 2. This program is licensed "as is" without any
-# warranty of any kind, whether express or implied.
-#
-# Ideas/code used from:
-# https://github.com/armbian/config/blob/master/debian-software
-# https://forum.openmediavault.org/index.php/Thread/25062-Install-OMV5-on-Debian-10-Buster/
-#
-# version: 1.5.2
-#
 
 if [[ $(id -u) -ne 0 ]]; then
   echo "This script must be executed as root or using sudo."
   exit 99
 fi
 
-#systemd="$(ps --no-headers -o comm 1)"
-#if [ ! "${systemd}" = "systemd" ]; then
-#  echo "This system is not running systemd.  Exiting..."
-#  exit 100
-#fi
-
 declare -i cfg=0
-declare -i ipv6=0
-declare -i rpi=0
+declare -i rpi=1
 declare -i skipFlash=0
 declare -i skipNet=0
 declare -i skipReboot=0
@@ -49,14 +24,8 @@ defaultGovSearch="^CONFIG_CPU_FREQ_DEFAULT_GOV_"
 forceIpv4="/etc/apt/apt.conf.d/99force-ipv4"
 ioniceCron="/etc/cron.d/make_nas_processes_faster"
 ioniceScript="/usr/sbin/omv-ionice"
-keyserver="hkp://keyserver.ubuntu.com:80"
-omvKey="/etc/apt/trusted.gpg.d/openmediavault-archive-keyring.asc"
-omvRepo="http://packages.openmediavault.org/public"
-omvSources="/etc/apt/sources.list.d/openmediavault.list"
 rfkill="/usr/sbin/rfkill"
 smbOptions="min receivefile size = 16384\ngetwd cache = yes"
-url="https://github.com/OpenMediaVault-Plugin-Developers/packages/raw/master/"
-vsCodeList="/etc/apt/sources.list.d/vscode.list"
 wpaConf="/etc/wpa_supplicant/wpa_supplicant.conf"
 
 export DEBIAN_FRONTEND=noninteractive
@@ -68,11 +37,7 @@ export LC_CTYPE="C"
 export LC_MESSAGES="C"
 export LC_ALL="C"
 
-if [ -f /etc/armbian-release ]; then
-  . /etc/armbian-release
-fi
-
-while getopts "fhinr" opt; do
+while getopts "fhnr" opt; do
   echo "option ${opt}"
   case "${opt}" in
     f)
@@ -82,8 +47,6 @@ while getopts "fhinr" opt; do
       echo "Use the following flags:"
       echo "  -f"
       echo "    to skip the installation of the flashmemory plugin"
-      echo "  -i"
-      echo "    enable using IPv6 for apt"
       echo "  -n"
       echo "    to skip the network setup"
       echo "  -r"
@@ -94,9 +57,6 @@ while getopts "fhinr" opt; do
       echo "  install -f"
       echo "  install -n"
       exit 100
-      ;;
-    i)
-      ipv6=1
       ;;
     n)
       skipNet=1
@@ -109,24 +69,6 @@ while getopts "fhinr" opt; do
       ;;
   esac
 done
-
-# Fix permissions on / if wrong
-echo "Current / permissions = $(stat -c %a /)"
-chmod g-w,o-w /
-echo "New / permissions = $(stat -c %a /)"
-
-# if ipv6 is not enabled, create apt config file to force ipv4
-if [ ${ipv6} -ne 1 ]; then
-  echo "Forcing IPv4 only for apt..."
-  echo 'Acquire::ForceIPv4 "true";' > ${forceIpv4}
-fi
-
-
-echo "Updating repos before installing..."
-apt-get --allow-releaseinfo-change update
-
-echo "Installing lsb_release..."
-apt-get --yes --no-install-recommends --reinstall install lsb-release
 
 arch="$(dpkg --print-architecture)"
 
@@ -154,14 +96,12 @@ case ${codename} in
     version=6
     ;;
   *)
-    echo "Unsupported version.  Only Debian 10 (Buster) and 11 (Bullseye) are supported.  Exiting..."
+    echo "Unsupported version. Only Debian 10 (Buster) and 11 (Bullseye) are supported.  Exiting..."
     exit 1
   ;;
 esac
 echo "${omvCodename} :: ${version}"
 
-#hostname="$(hostname --short)"
-#domainname="$(hostname --domain)"
 hostname="raspberrypi"
 domainname="local"
 tz="$(timedatectl show --property=Timezone --value)"
@@ -172,59 +112,9 @@ if [[ ! ${hostname} =~ ${regex} ]]; then
     exit 6
 fi
 
-# Add Debian signing keys to raspbian to prevent apt-get update failures
-# when OMV adds security and/or backports repos
-if grep -rq raspberrypi.org /etc/apt/*; then
-  rpi=1
-  echo "Adding Debian signing keys..."
-  for key in AA8E81B4331F7F50 112695A0E562B32A 04EE7237B7D453EC 648ACFD622F3D138; do
-    apt-key adv --no-tty --keyserver ${keyserver} --recv-keys "${key}"
-  done
-  echo "Installing monit from raspberrypi repo..."
-  apt-get --yes --no-install-recommends install -t ${codename} monit
-
-  # remove vscode repo if found since there is no desktop environment
-  # empty file will exist to keep raspberrypi-sys-mods package from adding it back
-  truncate -s 0 "${vsCodeList}"
-fi
-
-echo "Install prerequisites..."
-apt-get --yes --no-install-recommends install dirmngr gnupg
-
 # install openmediavault if not installed already
 omvInstall=$(dpkg -l | awk '$2 == "openmediavault" { print $1 }')
 if [[ ! "${omvInstall}" == "ii" ]]; then
-  echo "Installing openmediavault required packages..."
-  if ! apt-get --yes --no-install-recommends install postfix; then
-    echo "failed installing postfix"
-    exit 2
-  fi
-
-  echo "Adding openmediavault repo and key..."
-  echo "deb ${omvRepo} ${omvCodename} main" > ${omvSources}
-  wget -O "${omvKey}" ${omvRepo}/archive.key
-  apt-key add "${omvKey}"
-
-  echo "Updating repos..."
-  if ! apt-get update; then
-    echo "failed to update apt repos."
-    exit 2
-  fi
-
-  echo "Install openmediavault-keyring..."
-  if ! apt-get --yes install openmediavault-keyring; then
-    echo "failed to install openmediavault-keyring package."
-    exit 2
-  fi
-
-  monitInstall=$(dpkg -l | awk '$2 == "monit" { print $1 }')
-  if [[ ! "${monitInstall}" == "ii" ]]; then
-    if ! apt-get --yes --no-install-recommends install monit; then
-      echo "failed installing monit"
-      exit 2
-    fi
-  fi
-
   echo "Installing openmediavault..."
   aptFlags="--yes --auto-remove --show-upgraded --allow-downgrades --allow-change-held-packages --no-install-recommends"
   cmd="apt-get ${aptFlags} install openmediavault"
@@ -262,10 +152,6 @@ echo "Downloading omv-extras.org plugin for openmediavault ${version}.x ..."
 file="openmediavault-omvextrasorg_latest_all${version}.deb"
 
 if [ -f "${file}" ]; then
-  rm ${file}
-fi
-wget ${url}/${file}
-if [ -f "${file}" ]; then
   if ! dpkg --install ${file}; then
     echo "Installing other dependencies ..."
     apt-get --yes --fix-broken install
@@ -286,9 +172,6 @@ if [ -f "${file}" ]; then
       exit 3
     fi
   fi
-
-  echo "Updating repos ..."
-  apt-get update
 else
   echo "There was a problem downloading the package."
 fi
@@ -374,7 +257,7 @@ else
   if [ -f "/proc/config.gz" ]; then
     defaultGov="$(zgrep "${defaultGovSearch}" /proc/config.gz | sed -e "s/${defaultGovSearch}\(.*\)=y/\1/")"
   elif [ -f "/boot/config-$(uname -r)" ]; then
-    defaultGov="$(grep "${defaultGovSearch}" /boot/config-$(uname -r) | sed -e "s/${defaultGovSearch}\(.*\)=y/\1/")"
+    defaultGov="$(grep "${defaultGovSearch}" /boot/config-"$(uname -r)" | sed -e "s/${defaultGovSearch}\(.*\)=y/\1/")"
   fi
   if [ -z "${DEFAULT_GOV}" ]; then
     defaultGov="ondemand"

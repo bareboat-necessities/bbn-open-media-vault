@@ -1,0 +1,12 @@
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/firstrun
+StandardOutput=syslog
+StandardError=syslog
+User=root
+
+[Unit]
+Before=default.target
+
+[Install]
+WantedBy=multi-user.target

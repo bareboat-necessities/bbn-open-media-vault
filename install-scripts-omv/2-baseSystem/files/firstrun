@@ -1,0 +1,17 @@
+#!/bin/bash -e
+
+# Fix a bug documented somewhere in gentoo bug tracker
+update-mime-database /usr/share/mime
+
+if [ -x /usr/local/sbin/ufw-init ]
+then
+  /usr/local/sbin/ufw-init # Init firewall
+fi
+
+touch /tmp/FIRSTRUN
+systemctl disable firstRun.service
+
+if [ -x /usr/local/sbin/install-omv-first-boot ]
+then
+  /usr/local/sbin/install-omv-first-boot # Init OpenMediaVault
+fi

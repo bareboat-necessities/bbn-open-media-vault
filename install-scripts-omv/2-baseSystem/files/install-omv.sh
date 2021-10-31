@@ -38,15 +38,6 @@ smbOptions="min receivefile size = 16384\ngetwd cache = yes"
 url="https://github.com/OpenMediaVault-Plugin-Developers/packages/raw/master/"
 vsCodeList="/etc/apt/sources.list.d/vscode.list"
 
-export DEBIAN_FRONTEND=noninteractive
-export APT_LISTCHANGES_FRONTEND=none
-export LANG="en_US.UTF-8"
-export LANGUAGE=en_US:en
-export LC_NUMERIC="C"
-export LC_CTYPE="C"
-export LC_MESSAGES="C"
-export LC_ALL="C"
-
 if [ -f /etc/armbian-release ]; then
   . /etc/armbian-release
 fi

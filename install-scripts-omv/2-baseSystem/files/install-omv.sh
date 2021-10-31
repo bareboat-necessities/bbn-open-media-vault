@@ -25,7 +25,6 @@ fi
 
 declare -i ipv6=0
 declare -i version
-declare -i skipFlash=0
 declare -l codename
 declare -l omvCodename
 declare -l omvInstall=""
@@ -52,12 +51,9 @@ if [ -f /etc/armbian-release ]; then
   . /etc/armbian-release
 fi
 
-while getopts "fhi" opt; do
+while getopts "hi" opt; do
   echo "option ${opt}"
   case "${opt}" in
-    f)
-      skipFlash=1
-      ;;
     h)
       echo "Use the following flags:"
       echo "  -i"
@@ -186,14 +182,6 @@ if [[ ! "${omvInstall}" == "ii" ]]; then
     fi
   fi
 
-  echo "Installing openmediavault..."
-  aptFlags="--yes --auto-remove --show-upgraded --allow-downgrades --allow-change-held-packages --no-install-recommends"
-  cmd="apt-get ${aptFlags} --download-only install openmediavault"
-  if ! ${cmd}; then
-    echo "failed to install openmediavault package."
-    exit 2
-  fi
-
   # install omv-extras
   echo "Downloading omv-extras.org plugin for openmediavault ${version}.x ..."
   file="openmediavault-omvextrasorg_latest_all${version}.deb"
@@ -201,26 +189,8 @@ if [[ ! "${omvInstall}" == "ii" ]]; then
   if [ -f "/${file}" ]; then
     rm /${file}
   fi
-  wget ${url}/${file} -P /
+  wget ${url}/${file} -O /${file}
 
-fi
-
-# install flashmemory plugin unless disabled
-if [ ${skipFlash} -eq 1 ]; then
-  echo "Skipping installation of the flashmemory plugin."
-else
-  echo "Install folder2ram..."
-  if apt-get --yes --fix-missing --no-install-recommends --download-only install folder2ram; then
-    echo "Installed folder2ram."
-  else
-    echo "Failed to install folder2ram."
-  fi
-  echo "Install flashmemory plugin..."
-  if apt-get --yes --download-only install openmediavault-flashmemory; then
-    echo "Installed flashmemory plugin."
-  else
-    apt-get --yes --fix-broken install
-  fi
 fi
 
 exit 0

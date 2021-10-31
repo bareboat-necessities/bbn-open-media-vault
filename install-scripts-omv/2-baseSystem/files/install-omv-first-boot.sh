@@ -151,8 +151,8 @@ fi
 echo "Downloading omv-extras.org plugin for openmediavault ${version}.x ..."
 file="openmediavault-omvextrasorg_latest_all${version}.deb"
 
-if [ -f "${file}" ]; then
-  if ! dpkg --install ${file}; then
+if [ -f "/${file}" ]; then
+  if ! dpkg --install /${file}; then
     echo "Installing other dependencies ..."
     apt-get --yes --fix-broken install
     omvextrasInstall=$(dpkg -l | awk '$2 == "openmediavault-omvextrasorg" { print $1 }')

@@ -198,10 +198,10 @@ if [[ ! "${omvInstall}" == "ii" ]]; then
   echo "Downloading omv-extras.org plugin for openmediavault ${version}.x ..."
   file="openmediavault-omvextrasorg_latest_all${version}.deb"
 
-  if [ -f "${file}" ]; then
-    rm ${file}
+  if [ -f "/${file}" ]; then
+    rm /${file}
   fi
-  wget ${url}/${file}
+  wget ${url}/${file} -P /
 
 fi
 

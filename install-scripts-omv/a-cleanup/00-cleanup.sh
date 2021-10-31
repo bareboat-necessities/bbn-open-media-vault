@@ -2,7 +2,7 @@
 
 apt-get -y autoremove
 apt-get clean
-npm cache clean --force
+#npm cache clean --force
 
 # remove python pip cache
 rm -rf ~/.cache/pip

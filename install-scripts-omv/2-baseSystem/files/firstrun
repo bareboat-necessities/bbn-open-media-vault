@@ -14,6 +14,6 @@ systemctl disable firstRun.service
 if [ -x /usr/local/sbin/install-omv-first-boot ]
 then
   /usr/local/sbin/install-omv-first-boot -nr # Init OpenMediaVault
-  servicectl disable wd_keepalive
-  servicectl disable watchdog
+  systemctl disable wd_keepalive
+  systemctl disable watchdog
 fi

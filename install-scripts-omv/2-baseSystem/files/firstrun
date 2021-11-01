@@ -13,5 +13,5 @@ systemctl disable firstRun.service
 
 if [ -x /usr/local/sbin/install-omv-first-boot ]
 then
-  /usr/local/sbin/install-omv-first-boot # Init OpenMediaVault
+  /usr/local/sbin/install-omv-first-boot -nr # Init OpenMediaVault
 fi

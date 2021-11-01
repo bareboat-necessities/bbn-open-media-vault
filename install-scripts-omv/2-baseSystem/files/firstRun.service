@@ -6,7 +6,9 @@ StandardError=syslog
 User=root
 
 [Unit]
-Before=default.target
+After=systemd-user-sessions.service plymouth-quit-wait.service
+After=rc-local.service
+Before=getty.target
 
 [Install]
 WantedBy=multi-user.target

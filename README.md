@@ -8,6 +8,18 @@ Cloudsmith is the only fully hosted, cloud-native, universal package management 
 enables your organization to create, store and share packages in any format, to any place, with total
 confidence.
 
+# Notes
+
+It's a headless server with samba, ssh and firewall.
+
+- After install and reboot login as user pi and password raspberry
+
+- Run sudo raspi-config and set up Locale and Network (if needed)
+
+- You can login remotely via ssh from local LAN as user pi after your system is on a network
+
+- http://raspberrypi in your browser will give OpenMediaVault web UI. Login as user admin and password openmediavault.
+
 # License
 
 bbn-open-media-vault scripts distributed under GPLv3

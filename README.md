@@ -8,6 +8,10 @@ Cloudsmith is the only fully hosted, cloud-native, universal package management 
 enables your organization to create, store and share packages in any format, to any place, with total
 confidence.
 
+# Download 
+
+https://cloudsmith.io/~bbn-cica/repos/bbn-open/packages/?q=bbn-omv
+
 # Notes
 
 It's a headless server with samba, ssh and firewall.
